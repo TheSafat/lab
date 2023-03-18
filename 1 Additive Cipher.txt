@@ -1,23 +1,24 @@
 #include<bits/stdc++.h>
 using namespace std;
-
-string cipher(string p, int k)
+string cipher(string s,int k)
 {
-    string c="";
-    for(int i=0;i<p.size();i++) 
-        c += (p[i]-'a'+k)%26+'A';
-    return c;
+    for(int i=0 ; i < s.length() ; i++){
+        s[i] = ((s[i]-'a') + k) % 26 + 'A';
+    }
+    return s;
 }
-string decipher(string c, int k)
+string decipher(string s,int k)
 {
-    string p="";
-    for(int i=0;i<c.size();i++)
-        p += (c[i]-'A'-k+26)%26+'a';
-    return p;
+    for(int i=0 ; i < s.length() ; i++){
+        s[i] = ((s[i]-'A') + (26-k)) % 26 + 'a';
+    }
+    return s;
 }
-
 int main()
 {
-    cout<<decipher("HELLO",0);
-    //cout<<encryption_additive("hello",0)<<endl;
+    string p;
+    int k;
+    cin>>p>>k;
+    string c = cipher(p,k);
+    cout<< decipher(c,k) <<endl;
 }

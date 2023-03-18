@@ -1,44 +1,37 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-int modInverse(int k1)
+int modInverse(int k)
 {
     for(int i=1; i<26; i++) {
-        if((k1 * i) % 26 == 1) return i;
+        if((k * i) % 26 == 1) return i;
     }
-
     return -1;
 }
-string encryption(string s, int k)
+
+string cipher(string s,int k)
 {
-    for(int i = 0; i < s.length(); i++){
-        s[i] = ((s[i] - 'a') * k)%26 + 'A';
+    for (int i=0 ; i < s.length() ; i++){
+        s[i] = ((s[i]-'a') * k) % 26 + 'A';
     }
     return s;
 }
-string decryption(string s, int k)
+
+string decipher(string s,int k)
 {
     k = modInverse(k);
-    for(int i = 0; i < s.length(); i++){
-        s[i] = ((s[i] - 'A') * k)%26 + 'a';
+    for (int i=0 ; i < s.length() ; i++){
+        s[i] = ((s[i]-'A') * k) % 26 + 'a';
     }
     return s;
 }
-
-
 
 int main()
 {
-    string plain_text;
-    int key;
-    cin >> plain_text >> key;
-    string cipher_text = encryption(plain_text,key);
-    cout << "Cipher Text : " << cipher_text << "\n";
-    plain_text = decryption(cipher_text,key);
-    cout << "Plain Text : " << plain_text << "\n";
-
-    return 0;
+    string p;
+    int k;
+    cin>>p>>k;
+    string c = cipher(p,k);
+    cout<< decipher(c,k) <<endl;
 }
-
-
 
