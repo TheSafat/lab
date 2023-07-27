@@ -1,6 +1,7 @@
 #include<bits/stdc++.h>
 using namespace std;
-string encryption(string s, int key)
+
+string enc_autokey(string s, int key)
 {
     for(int i = 0; i < s.length(); i++){
         int temp = s[i]-'a';
@@ -9,7 +10,8 @@ string encryption(string s, int key)
     }
     return s;
 }
-string decryption(string s, int key)
+
+string dec_autokey(string s, int key)
 {
     for(int i = 0; i < s.length(); i++){
         s[i] = (s[i] - 'A' -key +26)%26 + 'a';
@@ -17,20 +19,21 @@ string decryption(string s, int key)
     }
     return s;
 }
+
 int main()
 {
     freopen("inp.txt","r",stdin);
     //freopen("out.txt","w",stdout);
 
-    string plain_text;
-    int key;
-    cin >> plain_text >> key;
-    
-    string cipher_text = encryption(plain_text,key);
-    cout << "ciphertext: " << cipher_text << "\n";
+    string msg;
+    int k;
+    cin >> msg >> k;
 
-    plain_text = decryption(cipher_text,key);
-    cout << "plaintext: "<< plain_text << "\n";
+    string c = enc_autokey(msg,k);
+    cout << "ciphertext: " << c << "\n";
+
+    string p = dec_autokey(c,k);
+    cout << "plaintext: "<< p << "\n";
 
     return 0;
 }

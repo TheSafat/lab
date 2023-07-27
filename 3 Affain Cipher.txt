@@ -1,37 +1,35 @@
 #include<bits/stdc++.h>
 using namespace std;
 
-string encryption_affine(string plainText, int k1, int k2);
-string decryption_affine(string cipherText, int k1, int k2);
+string enc_affine(string s, int k1, int k2);
+string dec_affine(string s, int k1, int k2);
 int modInverse(int k1);
 
 int main()
 {
-
     freopen("inp2.txt", "r", stdin);
 
-    string plainText;
-    cin >> plainText;
-
+    string msg;
     int k1, k2;
-    cin >> k1 >> k2;
+
+    cin >> msg >> k1 >> k2;
 
     if(modInverse(k1) == -1)
     {
-        cout <<"There is no multiplicative inverse for " << k1<<  ". Write valid key in the text file and run again.\n";
+        cout <<"There is no multiplicative inverse for " << k1 << endl;
         return 0;
     }
 
-    string cipherText = encryption_affine(plainText, k1, k2);
-    cout << "The cipherText is: " << cipherText << "\n";
+    string c = enc_affine(msg, k1, k2);
+    cout << "The cipherText is: " << c << "\n";
 
-    string decipherText = decryption_affine(cipherText, k1, k2);
-    cout << "The decipherText is: " << decipherText << "\n";
+    string p = dec_affine(c, k1, k2);
+    cout << "The decipherText is: " << p << "\n";
 
     return 0;
 }
 
-string encryption_affine(string s, int k1, int k2)
+string enc_affine(string s, int k1, int k2)
 {
     for(int i=0; i<s.length(); i++) {
         s[i] = (((s[i] - 'a') * k1) + k2) % 26 + 'A';
@@ -39,7 +37,7 @@ string encryption_affine(string s, int k1, int k2)
     return s;
 }
 
-string decryption_affine(string s, int k1, int k2)
+string dec_affine(string s, int k1, int k2)
 {
     int k1_inverse = modInverse(k1);
 
