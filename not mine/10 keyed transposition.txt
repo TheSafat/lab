@@ -1,0 +1,57 @@
+#include<bits/stdc++.h>
+using namespace std;
+int numberOfBogus = -1;
+string encrypt(string &Plaintext, vector<int> &key)
+{
+    if(numberOfBogus == -1)
+    {
+        numberOfBogus = key.size() - Plaintext.size() % key.size();
+        char BogusChar = 'z';
+        for(int i=0; i<numberOfBogus; i++) Plaintext += BogusChar;
+    }
+    string cipherText = "";
+    for(int i=0; i<Plaintext.size(); i += key.size())
+    {
+        string subCipher = "";
+        for(int j=0; j<key.size(); j++)
+            subCipher += Plaintext[i + key[j] - 1];
+        cipherText += subCipher;
+    }
+    return cipherText;
+}
+string decrypt(string &cipherText, vector<int> &key)
+{
+    vector<pair<int, int> > keyWithPostion;
+    for(int i=1; i<=key.size(); i++)
+    {
+        keyWithPostion.push_back({key[i-1], i});
+    }
+    sort(keyWithPostion.begin(), keyWithPostion.end());
+    vector<int> key2;
+    for(int i=0; i<keyWithPostion.size(); i++) key2.push_back(keyWithPostion[i].second);
+    string Plaintext = encrypt(cipherText, key2);
+    return Plaintext.substr(0, Plaintext.size()-numberOfBogus);
+}
+
+int main()
+{
+    string Plaintext, cipherText, ResultPlaintext;
+    cout<<"Enter the plainText: ";
+    getline(cin, Plaintext);
+    transform(Plaintext.begin(), Plaintext.end(), Plaintext.begin(), ::tolower);
+    Plaintext.erase(std::remove(Plaintext.begin(), Plaintext.end(), ' '), Plaintext.end());
+    int en[]= {3,1,4,5,2};
+    vector<int>key;
+    for(int i=0; i<(sizeof(en)/sizeof(en[0])); i++)
+    {
+        key.push_back(en[i]);
+    }
+    cipherText = encrypt(Plaintext, key);
+    transform(cipherText.begin(), cipherText.end(), cipherText.begin(), ::toupper);
+    cout<<"\nThe cipherText is: "<<cipherText<<endl<<endl;
+    ResultPlaintext = decrypt(cipherText, key);
+    transform(ResultPlaintext.begin(), ResultPlaintext.end(), ResultPlaintext.begin(), ::tolower);
+    cout<<"The decipherText is: "<<ResultPlaintext<<endl;
+    return 0;
+}
+

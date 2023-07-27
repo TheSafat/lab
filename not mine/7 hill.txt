@@ -1,0 +1,140 @@
+#include <bits/stdc++.h>
+using namespace std;
+#define Max_Dim 100
+struct matrix
+{
+    int data[Max_Dim][Max_Dim];
+    int row, col;
+    matrix(int r, int c)
+    {
+        row = r;
+        col = c;
+
+        for(int i = 0; i < row; i++)
+            for(int j = 0; j < col; j++)
+                data[i][j] = 25;
+    }
+    void print()
+    {
+        for(int i = 0; i < row; i++)
+        {
+            cout<<"\t";
+            for(int j = 0; j < col; j++) cout<<data[i][j]<<"\t";
+            cout<<endl;
+        }
+        cout<<endl;
+    }
+};
+matrix operator*(const matrix &MatA, const matrix &MatB)
+{
+    matrix answer(MatA.row, MatB.col);
+    for(int i = 0; i < MatA.row; i++)
+    {
+        for(int j = 0; j < MatB.col; j++)
+        {
+            answer.data[i][j] = 0;
+            for(int k = 0; k < MatA.col; k++) answer.data[i][j] = (answer.data[i][j] + (MatA.data[i][k]
+                        * MatB.data[k][j])) % 26;
+        }
+    }
+    return answer;
+}
+string validation(string &str)
+{
+    string valid = "";
+    for(int i = 0; i<str.size(); i++)
+    {
+        if(str[i] >= 'a' && str[i] <= 'z') valid += str[i];
+        else if(str[i] >= 'A' && str[i] <= 'Z') valid += (str[i] + 32);
+        else continue;
+    }
+    return valid;
+}
+matrix PlainText_to_Matrix(string &Plaintext)
+{
+    matrix PlainMatrix(ceil(Plaintext.size()/2.0), 2);
+    int row = -1, col;
+    for(int j = 0; j < Plaintext.size(); j++)
+    {
+        col = j % 2;
+        if(!col) row++;
+        PlainMatrix.data[row][col] = (Plaintext[j] - 'a');
+    }
+    return PlainMatrix;
+}
+int ModInverse(int key)
+{
+    for(int i=1; i<=26; i++)
+    {
+        if((i*key) % 26 == 1) return i;
+    }
+    return -1;
+}
+matrix inverseMatrix(matrix InverseMatrix)
+{
+    swap(InverseMatrix.data[0][0], InverseMatrix.data[1][1]); 
+    InverseMatrix.data[0][1] *= -1;
+    InverseMatrix.data[1][0] *= -1;
+    int deteminant = InverseMatrix.data[0][0]*InverseMatrix.data[1][1] -
+                     InverseMatrix.data[1][0]*InverseMatrix.data[0][1];
+    int multiplicativeInverse = ModInverse((deteminant % 26 + 26) + 26);
+    for(int i = 0; i < InverseMatrix.row; i++)
+    {
+        for(int j = 0; j < InverseMatrix.col; j++)
+        {
+            InverseMatrix.data[i][j] = ((InverseMatrix.data[i][j] * multiplicativeInverse) % 26 + 26) % 26;
+        }
+    }
+    cout<<"Inverse Matrix: "<<endl;
+    InverseMatrix.print();
+    return InverseMatrix;
+}
+bool isValidKey(matrix &keyMatrix)
+{
+    int deteminant = keyMatrix.data[0][0]*keyMatrix.data[1][1] -
+                     keyMatrix.data[1][0]*keyMatrix.data[0][1];
+    return deteminant!=0 && ModInverse((deteminant % 26 + 26) + 26)!=-1;
+}
+string ResultPlaintextMarrix_to_ResultPlaintext(matrix &ResultPlaintextMarrix)
+{
+    string finalDecResult = "";
+    for(int i = 0; i<ResultPlaintextMarrix.row; i++)
+        for(int j = 0; j<ResultPlaintextMarrix.col; j++) finalDecResult +=
+                char(ResultPlaintextMarrix.data[i][j] + 'a');
+    return finalDecResult;
+}
+int main()
+{
+    freopen("hill_input.txt", "r", stdin); 
+    string Plaintext, ResultPlaintext, LineInput;
+    getline(cin, Plaintext);
+    matrix KeyMatrix(2, 2); 
+    for(int i=0; i<2; i++)
+        for(int j=0; j<2; j++) cin>>KeyMatrix.data[i][j];
+    cout<<"Your Key Matrix: "<<endl;
+    KeyMatrix.print();
+    if(!isValidKey(KeyMatrix))
+    {
+        cout<<"The key is not valid"<<endl;
+        return 0;
+    }
+    Plaintext = validation(Plaintext);
+    cout<<"Your PlainText is: "<<Plaintext<<endl<<endl;
+    matrix PlainMatrix = PlainText_to_Matrix(Plaintext);
+    cout<<"Your Plain Matrix is: "<<endl;
+    PlainMatrix.print();
+    cout<<endl<<"Encryption: ";
+    matrix CipherMatrix = PlainMatrix * KeyMatrix;
+    cout<<"(Done)"<<endl;
+    cout<<"CipherMatrix (Encrypted Result): "<<endl;
+    CipherMatrix.print();
+    matrix ResultPlaintextMarrix = CipherMatrix * inverseMatrix(KeyMatrix);
+    cout<<endl<<"Decryption: (Done)"<<endl;
+    cout<<"Decryption Result Plain Matrix:"<<endl;
+    ResultPlaintextMarrix.print();
+    ResultPlaintext = ResultPlaintextMarrix_to_ResultPlaintext(ResultPlaintextMarrix).substr(0,
+                      Plaintext.size());
+    cout<<"Result PlainText: "<<ResultPlaintext<<endl;
+    return 0;
+}
+
