@@ -1,0 +1,37 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+int key[26] = {'c','u','d','a','v','f','w','p','x','o','k','t','z','y','j','h','s','q','r','l','e','b','g','i','m','n'};
+
+string enc_mono(string s, int key[])
+{
+    s.erase(std::remove(s.begin(), s.end(), ' '), s.end());
+
+    string ans="";
+    for(int i=0;i<s.length();i++) ans += key[s[i]-'a'];
+    return ans;
+}
+
+string dec_mono(string s, int key2[])
+{
+    int key[26]={0};
+    for(int i=0;i<26;i++) key[key2[i]-'a'] = 'a'+i;
+
+    string ans="";
+    for(int i=0;i<s.length();i++) ans += key[s[i]-'a'];
+    return ans;
+}
+
+int main()
+{
+    string msg;
+    cout<<"Enter the message: ";
+    getline(cin, msg);
+
+    string c = enc_mono(msg, key);
+    string p = dec_mono(c, key);
+
+    cout<< "Encrypted text: " << c <<endl;
+    cout<< "Decrypted text: " << p <<endl;
+}
+
