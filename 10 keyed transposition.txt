@@ -1,0 +1,82 @@
+#include<bits/stdc++.h>
+using namespace std;
+int numberOfBogus = -1;
+
+vector<int> changeKey (vector <int> key)
+{
+    int en[key.size()]= {0};
+    for(int i=0; i<key.size() ; i++) en[key[i]-1] = i+1;
+    for(int i=0; i<key.size() ; i++) key[i] = en[i];
+    return key;
+}
+
+string addBogus(string s, vector <int> key)
+{
+    if(numberOfBogus == -1)
+    {
+        numberOfBogus = key.size() - s.size() % key.size();
+        char BogusChar = 'z';
+        for(int i=0; i<numberOfBogus; i++) s += BogusChar;
+    }
+
+    return s;
+}
+
+string enc(string s, vector<int> key)
+{
+    s = addBogus(s, key);
+
+    string ans = "";
+
+    for(int i=0; i<s.size(); i += key.size())
+    {
+        string subCipher = "";
+        for(int j=0; j<key.size(); j++)
+            subCipher += s[i + key[j] - 1];
+        ans += subCipher;
+    }
+
+    return ans;
+}
+string dec(string s, vector<int> key)
+{
+    key = changeKey(key);
+
+    string ans = "";
+
+    for(int i=0; i<s.size(); i += key.size())
+    {
+        string subCipher = "";
+        for(int j=0; j<key.size(); j++)
+            subCipher += s[i + key[j] - 1];
+        ans += subCipher;
+    }
+
+    return ans.substr(0, ans.size()-numberOfBogus);
+}
+
+int main()
+{
+    string msg, c, p;
+    cout<<"Enter the message: ";
+    getline(cin, msg);
+
+    //transform(Plaintext.begin(), Plaintext.end(), Plaintext.begin(), ::tolower);
+    msg.erase(std::remove(msg.begin(), msg.end(), ' '), msg.end());
+
+    int en[]= {3,1,4,5,2};
+    vector<int>key;
+    for(int i=0; i<(sizeof(en)/sizeof(en[0])); i++)
+        key.push_back(en[i]);
+
+    c = enc(msg, key);
+    //transform(c.begin(), c.end(), c.begin(), ::toupper);
+    cout<<"\nThe cipherText is: "<<c<<endl<<endl;
+
+    p = dec(c, key);
+    //transform(p.begin(), p.end(), p.begin(), ::tolower);
+    cout<<"The decipherText is: "<<p<<endl;
+
+    return 0;
+}
+

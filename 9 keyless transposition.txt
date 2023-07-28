@@ -1,0 +1,38 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+string enc_keyless_transposition(string s)
+{
+    string ans = "";
+    for(int i=0; i<s.size(); i+=2) ans += s[i] - 32;
+    for(int i=1; i<s.size(); i+=2) ans += s[i] - 32;
+    return ans;
+}
+
+string dec_keyless_transposition(string s)
+{
+    string ans = "";
+    int n = s.size();
+    for(int i=0, j=(n/2)+1; i<n/2; i++, j++)
+    {
+        ans += s[i] + 32;
+        ans += s[j] + 32;
+    }
+    if(n % 2 != 0) ans += s[n/2] + 32;
+
+    return ans;
+}
+
+int main()
+{
+    string msg;
+    cout << "Enter the plainText: ";
+    cin >> msg;
+
+    string c = enc_keyless_transposition(msg);
+    cout << "The cipherText is: " << c << endl;
+
+    cout << "The decipherText is: " << dec_keyless_transposition(c) << endl;
+
+    return 0;
+}
