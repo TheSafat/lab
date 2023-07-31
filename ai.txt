@@ -1,0 +1,425 @@
+1. Program Code:
+grade(english, 3). 
+grade(math, 3).     
+grade(history, 2).  
+
+gpa() :-
+    findall(Grade, grade(_, Grade), Grades),
+    sum_list(Grades, TotalGrade),
+    length(Grades, NumberOfCourses),
+    GPA is TotalGrade / NumberOfCourses,
+    format("GPA is: ~2f~n", [GPA]).
+
+Output:
+?- gpa().
+GPA is: 2.67
+true.
+
+?-
+
+
+
+
+
+2. Program Code:
+fibonacci(0, 0).
+fibonacci(1, 1).
+
+fibonacci(N, Result) :-
+    N > 1,
+    N1 is N-1,
+    N2 is N-2,
+    fibonacci(N1, Result1),
+    fibonacci(N2, Result2),
+    Result is Result1 + Result2.
+
+Output:
+?- fibonacci(9, Ans).
+Ans = 34 ;
+false.
+
+?-
+
+
+
+3. Program Code:
+factorial(0, 1).
+
+factorial(N, Result) :-
+    N > 0,
+    N1 is N-1,
+    factorial(N1, Result1),
+    Result is N * Result1.
+
+Output:
+?- factorial(7, Ans).
+Ans = 5040 ;
+false.
+
+?-
+
+
+
+4. Program Code:
+gcd(A,0,A).
+
+gcd(A,B,Result) :-
+    B > 0,
+    A1 is B,
+    B1 is A mod B,
+    gcd(A1, B1, Result).
+
+lcm(A,B,Result) :-
+    gcd(A,B,GCD),
+    Result is (A*B)/GCD.
+
+
+Output:
+?- gcd(21, 35, GCD).
+GCD = 7 ;
+
+?- lcm(21, 35, LCM).
+LCM = 105 .
+
+5. Program Code:
+edge(a,b).
+edge(a,c).
+edge(b,d).
+edge(d,e).
+edge(e,b).
+path(A,B):-nextRoute(A,B,[]), write(B).
+nextRoute(A,B,V) :-
+    edge(A,X), write(A), write('->'),
+    not(member(X,V)) ,
+    ( B = X;
+    nextRoute(X,B,[A|V]);
+    write(X)).
+
+
+Output:
+?- path(a,d).
+a->b->d
+true .
+
+?-
+
+
+6. Program Code:
+writeFile(File) :-
+   tell(File),
+   write("This is a demo."),
+   told,
+   writeln("Written in File.").
+
+readFile(File) :-
+   open(File,read,Str),
+   readWords(Str,Words),
+   close(Str),
+   write(Words),  nl.
+readWords(Stream,[]):-
+   at_end_of_stream(Stream).
+readWords(Stream,[X|L]):-
+   \+ at_end_of_stream(Stream),
+   readWord(Stream,X),
+   readWords(Stream,L).
+readWord(InStream,W):-
+         get_code(InStream,Char),
+         checkCharAndReadRest(Char,Chars,InStream),
+         atom_codes(W,Chars).
+
+   checkCharAndReadRest(10,[],_):-  !.
+   checkCharAndReadRest(32,[],_):-  !.
+   checkCharAndReadRest(-1,[],_):-  !.
+   checkCharAndReadRest(end_of_file,[],_):-  !.
+   checkCharAndReadRest(Char,[Char|Chars],InStream):-
+         get_code(InStream,NextChar),
+         checkCharAndReadRest(NextChar,Chars,InStream).
+
+Output:
+?- writeFile('in.txt').
+Written in File.
+true.
+
+?- readFile('in.txt').
+[This,is,a,demo.]
+true
+
+
+
+
+
+
+7. Program Code:
+edges(a, b).
+edges(a, c).
+edges(b, c).
+edges(b, d).
+edges(c, d).
+edges(d, e).
+edges(e, f).
+
+bfs(Start, Goal, Path) :-
+    bfs_queue([[Start]], Goal, RevPath),
+    reverse(RevPath, Path).
+
+bfs_queue([[Node|Path]|_], Node, [Node|Path]).
+bfs_queue([[Node|Path]|Rest], Goal, FinalPath) :-
+    findall([Next, Node|Path],
+            (edges(Node, Next), \+ member(Next, [Node|Path])),
+            NextPaths),
+    append(Rest, NextPaths, UpdatedQueue),
+    bfs_queue(UpdatedQueue, Goal, FinalPath).
+bfs_queue([_|Rest], Goal, Path) :-
+    bfs_queue(Rest, Goal, Path).
+
+
+Output:
+?- bfs(a,f,Path).
+Path = [a, b, d, e, f] .
+
+?-
+
+
+8. Program Code:
+edges(a, b).
+edges(a, c).
+edges(b, c).
+edges(b, d).
+edges(c, d).
+edges(d, e).
+edges(e, f).
+
+dfs(Start, Goal, Path) :-
+    dfs_helper(Start, Goal, [Start], Path).
+
+dfs_helper(Goal, Goal, AccPath, Path) :- reverse(AccPath, Path).
+dfs_helper(Node, Goal, AccPath, Path) :-
+    edges(Node, Next),
+    \+ member(Next, AccPath),
+    dfs_helper(Next, Goal, [Next|AccPath], Path).
+
+
+Output:
+?- dfs(a,f,Path).
+Path = [a, b, c, d, e, f] .
+
+?-
+
+9. Program Code:
+edges(a, b, 1).
+edges(a, c, 2).
+edges(b, c, 3).
+edges(b, d, 4).
+edges(c, d, 5).
+edges(d, e, 6).
+edges(e, f, 7).
+
+heuristic(a, f, 10).
+a_star(Start, Goal, Path) :-
+    astar_search([[(0, Start)]], Goal, Path).
+astar_search([(_, Node) | _], Node, Path) :- !.
+astar_search([Path | Rest], Goal, FinalPath) :-
+    Path = [(_, Node) | _],
+    findall((HeuristicCost + NewCost, Next),
+            (edges(Node, Next, StepCost),
+            NewCost is Cost + StepCost,
+            heuristic(Next, Goal, HeuristicCost),
+            \+ member(Next, Path)),
+            NextPaths),
+    append(NextPaths, Rest, UpdatedQueue),
+    keysort(UpdatedQueue, SortedQueue),
+    astar_search(SortedQueue, Goal, FinalPath).
+main :-
+    Start = a,
+    Goal = f,
+    a_star(Start, Goal, Path),
+    reverse(Path, PathInOrder),
+    format("A* Path from ~w to ~w: ~w~n", [Start, Goal, PathInOrder]).
+:- initialization(main).
+Output:
+?- main.
+Path = [a, b, d, e, f] .
+
+?-
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1. ;;;; Finding the area of a circle
+
+;(print "Enter the radius of the cirlce: ")
+(format t "Enter the radius of the cirlce: ")
+
+(defvar *radius* (read))
+
+(defun area(*radius*)
+	(defvar *a* (* (* *radius* *radius*) 3.1415) )
+	(format t "Area of the circle is: ~a ~%" *a*)
+)
+
+(area *radius*)
+
+
+
+
+2. ;;;; Finding the area of a triangle
+
+(format t "Enter the base of the triangle: ~%")
+(defvar *base* (read))
+
+(format t "Enter the height of the triangle: ~%")
+(defvar *height* (read))
+
+(defun area(*base* *height*)
+	(defvar *a* (* (* *base* *height*) 0.5) )
+	(format t "Area of the circle is: ~a square unit ~%" *a*)
+)
+
+(area *base* *height*)
+
+
+
+
+3. ;;;; Finding the sum and average of some number
+
+(format t "Enter the size of the array: ~%")
+(defvar n (read))
+
+(defvar sum 0)
+(defvar num 0)
+(defvar avg 1)
+
+(loop for x from 1 to n do 
+	(setf num (read))
+	(setf sum (+ sum num))
+)
+
+(setf avg (/ sum n))
+
+(format t "Sum of those numbers is: ~a ~%" sum)
+(format t "Average of those numbers is: ~5f ~%" (/ avg 1.0))
+
+
+
+
+4. ;;;; program 4 - array
+
+(format t "Enter the size of the array: ~%")
+(defvar *n* (read))
+
+(defparameter family (make-array (+ *n* 1)))
+
+(defvar *name*)
+
+(loop for x from 1 to *n* do 
+	(format t "Enter the name of studnet ~a: " x)
+	(setf *name* (read))
+	(setf (aref family x) *name*)
+)
+
+(format t " ~%~%Array elements: ~%")
+
+(loop for x from 1 to *n* do
+	(format t "Student ~a: ~a ~%" x (aref family x))
+)
+
+
+
+
+5. ;;;; Finding the outputs of all basic LISP manipulation functions
+
+(format t "(car  '(a b c))  = ~a ~%" (car '(a b c)))
+(format t "(cdr  '(a b c))  = ~a ~%" (cdr '(a b c)))
+(format t "(cons 'a '(b c)) = ~a ~%" (cons 'a '(b c)))
+(format t "(list 'a '(b c)) = ~a ~%" (list 'a '(b c)))
+
+
+
+
+6. ;;;; Finding the outputs of all additional LIST manipulation functions
+
+(format t "(append  '(a) '(b c)) = ~a ~%" (append  '(a) '(b c)))
+(format t "(last    '(a b c d))  = ~a ~%" (last  '(a b c d)))
+(format t "(member  'b '(a b d)) = ~a ~%" (member 'b '(a b d)))
+(format t "(reverse '(a (b c) d) = ~a ~%" (reverse '(a (b c) d)))
+
+
+
+
+7. ;;;; program 7 - Finding the max and min
+
+(format t "Enter the size of the array: ~%")
+(defvar *n* (read))
+
+(defparameter arr (make-array (+ *n* 1)))
+(defvar *num*)
+
+(loop for x from 1 to *n* do 
+	(format t "Enter a number at the array index ~a: " x)
+	(setf *num* (read))
+	(setf (aref arr x) *num*)
+)
+
+(defvar *max*)
+(defvar *min*)
+
+(setf *max* (aref arr 1))
+(setf *min* (aref arr 1))
+
+(loop for x from 2 to *n* do
+	(cond ( (< *max* (aref arr x))
+		(setf *max* (aref arr x))
+	      )
+	)
+	
+	(cond ( (> *min* (aref arr x))
+		(setf *min* (aref arr x))
+	      )
+	)
+)
+
+(format t "~%~%")
+(format t "Minimum value is: ~a ~%" *min*)
+(format t "Maximum value is: ~a ~%" *max*)
+(format t "~%~%")
+
+
+
+
+8. ;;;; program 8 - putprop
+
+(defun putprop (object value property)
+	(self (get object property) value)
+)
+
+(setq obj person)
+
+(putprop obj 'abir 'name)
+(putprop obj '24 'age)
+(putprop obj '5.5feet 'height)
+
+(setq n (get obj 'name))
+(format t "The name of ~a is: ~a ~%" obj n)
+
+
+(setq a (get obj 'age))
+(format t "The age of ~a is: ~a ~%" obj a)
+
+
+(setq h (get obj 'height))
+(format t "The height of ~a is: ~a ~%" obj h)
