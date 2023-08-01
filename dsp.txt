@@ -1,0 +1,263 @@
+1. basic signal
+% Square wave
+t=0:0.01:1;
+a=2;
+b=a*square(2*pi*2*t);
+subplot(3,3,3);
+stem(t,b);
+xlabel('time');
+ylabel('Amplitude');
+title('square wave');
+
+% unit impulse
+n=-5:5;
+a = [zeros(1,5),ones(1,1),zeros(1,5)];
+subplot(3,3,7);
+stem(n,a);
+xlabel ('time');
+ylabel ('amplitude');
+title('Unit impulse');
+
+
+2. DFT/IDFT
+xn=input('Enter the sequence x(n): ');
+ln=length(xn);
+xk=zeros(1,ln);
+
+for k=0:ln-1
+	for n=0:ln-1
+		xk(k+1)=xk(k+1)+(xn(n+1)*exp(-(1i)*2*pi*k*n/ln));
+	end
+end
+
+t=0:ln-1;
+subplot(2, 2, 1);
+stem(t,xn);
+ylabel ('Amplitude');
+xlabel ('Time Index');
+title('Input Sequence');
+
+magnitude=abs(xk);
+t=0:ln-1;
+subplot(2, 2, 2);
+stem(t,magnitude);
+ylabel ('Amplitude');
+xlabel ('K');
+title('Magnitude Response');
+
+phase=angle(xk);
+t=0:ln-1;
+subplot(2, 2, 3);
+stem(t,phase);
+ylabel ('Phase');
+xlabel ('K');
+title ('Phase Response');
+
+ixk=zeros(1,ln);
+for n=0:ln-1
+	for k=0:ln-1
+	ixk(n+1)=ixk(n+1)+real((xk(k+1)*exp((1i)*2*pi*k*n/ln)));
+	end
+end
+
+ixk=ixk./ln;
+t=0:ln-1;
+subplot(2, 2, 4);
+stem(t,ixk);
+ylabel ('Amplitude');
+xlabel ('Time Index');
+title ('IDFT sequence');
+
+
+3.Linear convolution
+x1 = input('Enter the first sequence: ');
+subplot(3, 1, 1);
+stem(x1);
+ylabel('Amplitude');
+title('Plot of the first sequence');
+
+x2 = input('Enter the second sequence: ');
+subplot(3, 1, 2);
+stem(x2);
+ylabel('Amplitude');
+title('Plot of the second sequence');
+
+f = conv(x1, x2);
+disp("Convolution: ");
+disp(f);
+
+subplot(3, 1, 3);
+stem(f);
+xlabel('Time index n');
+ylabel('Amplitude f');
+title('Linear convolution of sequence');
+
+4. auto correlation
+x = input('Enter sequence: ');
+subplot(2,1,1);
+stem(x);
+ylabel('Amplitude');
+title('Input Sequence');
+
+subplot(2,1,2);
+y = xcorr(x,x);
+stem(y);
+ylabel('Amplitude');
+title('Auto correlation of the Sequence');
+
+disp("Auto correlation: ");
+disp(y);
+
+5. find the fft of the sequence
+x=input('Enter the sequence : ');
+N=length(x);
+xk=fft(x);
+
+n=0:N-1;
+subplot (2,2,1);
+stem(n,x);
+xlabel('n---->');
+ylabel('Amplitude');
+title('Input sequence');
+
+subplot (2,2,2);
+stem(n,abs(xk));
+xlabel('n---->');
+ylabel('Magnitude');
+title('Magnitude response');
+
+subplot (2,2,3);
+stem(n,angle(xk));
+xlabel('n---->');
+ylabel('Phase');
+title('Phase responce');
+
+
+
+
+
+
+
+
+6. implementation of interpolation process
+F=input('Enter the frequency of the signal: ');
+P=input('Enter the interpolator factor: ');
+N=input('Enter the length of the signal: ');
+
+t=0:1:N-1;
+X = sin(2*pi*F*t);
+subplot(2,1,1);
+stem(X);
+title("Original signal");
+
+i=interp(X,P);
+subplot(2,1,2);
+stem(i);
+title("Interpolated signal");
+
+7. computation of n-point dft sequence
+x = input('Enter the sequence: ');
+n = input('Enter the value of N: ');
+ndft = fft(x,n);
+subplot(2,2,1);
+stem(x);
+xlabel("n--->");
+ylabel("Amplitude");
+title("Input Sequence");
+m = abs(ndft);
+N = 0:1:n-1;
+subplot(2,2,2);
+stem(N,m);
+xlabel('Length');
+ylabel('Amplitude of x(k)');
+title('Magnitude of N-Point DFT');
+p = angle(ndft);
+subplot(2,2,3);
+stem(N,p);
+xlabel('Length');
+ylabel('Phase of x(k)');
+title('Phase of N-Point DFT');
+
+9. To design a butterworth digital iir filter
+fs=100;
+f=5;
+t=5;
+n= 0: 1/fs :t;
+x=2*sin(2*pi*f*n);
+subplot(4,1,1);
+plot(n,x);
+title('Sinusoidal signal');
+
+z=awgn(x,1);
+subplot(4,1,2);
+plot(n,z);
+title('Sinusoidal signal with noise added');
+
+wc = 0.1;
+o = 1;
+
+%Low - pass Filter
+[b,a]=butter(o,wc,'low');
+iir=filter(b,a,z);
+subplot(4,1,3);
+plot(n,iir);
+title("Low-Pass Filtered Signnal");
+
+%High - pass Filter
+[b,a]=butter(o,wc,'high');
+iir=filter(b,a,z);
+subplot(4,1,4);
+plot(n,iir);
+title("High-Pass Filtered Signnal");
+
+
+
+8. varification of sampling theory
+t=-100:01:100;
+fm=0.02;
+x=cos(2*pi*t*fm);
+subplot(2,2,1);
+plot(t,x);
+xlabel('time in sec');
+ylabel('x(t)');
+title('Continuous Time Signal');
+
+fs1=0.02;
+n=-2:2;
+x1=cos(2*pi*fm*n/fs1);
+subplot(2,2,2);
+stem(n,x1);
+hold on
+
+subplot(2,2,2);
+plot(n,x1);
+title('Discrete Time Signal x(n) with fs<2fm');
+xlabel('n');
+ylabel('x(n)');
+
+fs2=0.04;
+n1=-4:4;
+x2=cos(2*pi*fm*n1/fs2);
+subplot(2,2,3);
+stem(n1,x2);
+hold on
+
+subplot(2,2,3);
+plot(n1,x2);
+title('Discrete Time Signal x(n) with fs=2fm');
+xlabel('n');
+ylabel('x(n)');
+
+n2=-50:50;
+fs3=0.5;
+x3=cos(2*pi*fm*n2/fs3);
+subplot(2,2,4);
+stem(n2,x3);
+hold on
+
+subplot(2,2,4);
+plot(n2,x3);
+grid on
+xlabel('n');
+ylabel('x(n)');
+title('Discrete Time Signal x(n) with fs>2fm');
